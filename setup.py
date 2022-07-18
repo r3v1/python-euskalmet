@@ -10,7 +10,7 @@ cwd = Path(__file__).parent.absolute()
 with open(cwd / "euskalmet" / '__version__.py', 'r') as f:
     exec(f.read(), about)
 
-with open('README.rst', 'r') as f:
+with open('README.md', 'r') as f:
     readme = f.read()
 
 packages = find_packages()
