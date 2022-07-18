@@ -13,7 +13,7 @@ import pytz
 import requests
 from tqdm import tqdm
 import os
-from exceptions import EuskalmetException
+from euskalmet.exceptions import EuskalmetException
 
 
 # TODO: Introducir loggers
