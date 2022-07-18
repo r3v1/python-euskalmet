@@ -7,4 +7,4 @@ pypi:
 	python setup.py sdist bdist_wheel
 
 	# 2. Upload to Pypi
-	# twine upload dist/*
+	 twine upload dist/*
