@@ -1,0 +1,7 @@
+requests
+tqdm
+pandas
+PyJWT
+pytz
+cryptography
+numpy
