@@ -13,7 +13,7 @@ import pytz
 import requests
 from tqdm import tqdm
 import os
-from euskalmet.exceptions import EuskalmetException
+from .exceptions import EuskalmetException
 
 
 # TODO: Introducir loggers
@@ -365,7 +365,7 @@ class Euskalmet:
             start_date = obs.index.max()
         else:
             # Empezar desde los últimos 30 días
-            start_date = pd.Timestamp(datetime.datetime.utcnow(), tz="utc").tz_convert(self.tz) - pd.Timedelta(days=60)
+            start_date = pd.Timestamp(datetime.datetime.utcnow(), tz="utc").tz_convert(self.tz) - pd.Timedelta(days=30)
         end_date = pd.Timestamp(datetime.datetime.utcnow(), tz="utc").tz_convert(self.tz) - pd.Timedelta(hours=1)
 
         start_date = start_date.floor("H")

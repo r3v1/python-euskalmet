@@ -36,9 +36,9 @@ la siguiente información:
 [PAYLOAD]
 ; Issuer (emisor): description issuer description, ex. company name
 iss =
-; Timestamp expiration: Ex. 1616081478
+; Timestamp expiration: Ex. 1696081478
 exp =
-; Emission timestamp: Ex. 1618673478
+; Emission timestamp: (today's epoch)
 iat =
 ; Api key owner email: Ex. name@company.com
 email =
