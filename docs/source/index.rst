@@ -16,6 +16,7 @@ issue o un pull request si quieres que esta librería tenga más funcionalidades
 
 * :doc:`introduccion`
 * :doc:`instalacion`
+* :doc:`changelog`
 
 .. toctree::
    :maxdepth: 2
@@ -24,6 +25,7 @@ issue o un pull request si quieres que esta librería tenga más funcionalidades
 
    introduccion
    instalacion
+   changelog
 
 **Contacto**
 

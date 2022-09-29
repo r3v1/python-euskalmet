@@ -41,8 +41,14 @@ extensions = [
     # 'sphinx.ext.viewcode', # añade el botón de ver código
     'sphinx.ext.todo',
     'IPython.sphinxext.ipython_console_highlighting',
-    'IPython.sphinxext.ipython_directive'
+    'IPython.sphinxext.ipython_directive',
+    'myst_parser',  # Para añadir el changelog
 ]
+
+source_suffix = {
+    '.rst': 'restructuredtext',
+    '.md': 'markdown',
+}
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
