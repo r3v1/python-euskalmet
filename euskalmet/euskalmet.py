@@ -1,6 +1,7 @@
 import configparser
 import datetime
 import json
+import os
 from functools import partial
 from multiprocessing import Pool
 from pathlib import Path
@@ -12,8 +13,8 @@ import pandas as pd
 import pytz
 import requests
 from tqdm import tqdm
-import os
-from .exceptions import EuskalmetException
+
+from exceptions import EuskalmetException
 
 
 # TODO: Introducir loggers
@@ -315,7 +316,10 @@ class Euskalmet:
                             )
 
                 # Download new readings
-                data = self.get_station_readings(**args)
+                try:
+                    data = self.get_station_readings(**args)
+                except EuskalmetException as e:
+                    continue
 
                 # Process data
                 dt = pd.Timestamp(datetime.datetime.fromtimestamp(int(data["dateRange"][6:16])), tz=self.tz)
@@ -342,7 +346,10 @@ class Euskalmet:
 
         return df
 
-    def automatic_download(self, station_id: str, multiprocess: bool = True):
+    def automatic_download(self,
+                           station_id: str,
+                           multiprocess: bool = True,
+                           start_date: Union[str, pd.Timestamp] = None):
         """
         Descarga las últimas observaciones de la estación dada. Si el fichero
         con observaciones existe, parte de la última hora registrada hasta ahora
@@ -356,10 +363,13 @@ class Euskalmet:
             Id de la estación
         multiprocess: bool
             Si es True, se utiliza multiprocessing para descargar las lecturas.
+        start_date: str, pd.Timestamp
+            Fecha de inicio de la búsqueda
         """
         obs_output = self.data_dir / f"{station_id}_OBS_MERGED.csv"
-
-        if obs_output.is_file():
+        if start_date is not None:
+            start_date = pd.Timestamp(start_date, tz="utc").tz_convert(self.tz)
+        elif obs_output.is_file():
             # Empezar desde la última hora guardada en el fichero
             obs = pd.read_csv(obs_output, index_col=["DATE"], parse_dates=["DATE"]).tz_convert(self.tz)
             start_date = obs.index.max()
@@ -405,6 +415,7 @@ class Euskalmet:
                     idx = df.index.difference(obs.index)
                     df = pd.concat([obs, df.loc[idx]])
 
+                df.sort_index(inplace=True)
                 df.to_csv(obs_output)
 
 

@@ -1,7 +1,21 @@
+# 0.0.3
+2022-09-29
+
+## Added
+
+- Se puede especificar la fecha de inicio de la búsqueda de mediciones en la función `automatic_download`.
+- Ordena el CSV exportado por fecha.
+
+## Fixed
+
+- Si `get_readings_from` encuentra un enlace inválido (`raise EuskalmetException()`), captura la excepción y continua
+  la búsqueda. Por ejemplo, en el pasado pudo existir un sensor que ahora no existe y viceversa.
+
+
 # 0.0.1
 2022-07-18
 
-### Added
+## Added
 
 - Las siguientes llamadas a la API han sido implementadas:
   - `/euskalmet/stations/{station_id}/current`: devuelve los datos actuales de la estación dada.
