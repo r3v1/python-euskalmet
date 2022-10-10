@@ -1,3 +1,20 @@
+# 0.2
+2022-10-10
+
+## Added
+
+- Se crea la clase `Geo` y `Weather` para la solicitud de información que tengan que ver con las
+  regiones y las predicciones meteo respectivamente.
+
+
+# 0.1
+2022-10-10
+
+## Added
+
+- Refactoriza los métodos de `Euskalmet` creando clases para cada tipo de solicitud.
+- Se crea la clase `Stations` para la solicitud de información que tengan que ver con las estaciones.
+
 # 0.0.3
 2022-09-29
 
@@ -23,4 +40,4 @@
   - `/euskalmet/readings/forStation/{station_id}/{sensor_id}/measures/{measure_type_id}/{measure_id}/at/{year}/{month}/{day}/{hour}`: devuelve las lecturas para una medida específica y una fecha específica.
 - Además, se proporcionan métodos algo más complicados para obtener en `DataFrame`s:
   - Todas las lecturas de una estación desde una fecha dada.
-  - La lista de sensores disponibles de una estación. 
+  - La lista de sensores disponibles de una estación.
