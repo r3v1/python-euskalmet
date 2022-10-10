@@ -5,7 +5,8 @@ from pathlib import Path
 import jwt
 import pytz
 import requests
-from exceptions import EuskalmetException
+
+from .exceptions import EuskalmetException
 
 # TODO: Introducir loggers
 
