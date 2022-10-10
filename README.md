@@ -46,13 +46,12 @@ email =
 
 ## Usar la librería
 
-La clase principal de la librería es la clase Euskalmet.
+Si por ejemplo, se quiere descargar las observaciones de una estación,
 
 ```
-euskalmet = Euskalmet() # Inicializa el objeto
-
-station_id = "C017"  # Define el identificador de la estación
-euskalmet.automatic_download(station_id, multiprocess=True) # Descarga la información de la estación
+from euskalmet import Stations
+estacion = Stations("C017") # Inicializa el objeto
+estacion.automatic_download(multiprocess=True) # Descarga la información de la estación
 ```
 
 Para más información, revisa la documentación.
