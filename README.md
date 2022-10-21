@@ -44,6 +44,14 @@ iat =
 email =
 ```
 
+**Importante**
+
+Destacar, los campos `exp` y `iat` son *timestamps* ([epochs](https://espanol.epochconverter.com/)). El campo
+`exp`  (fecha de expiración) tiene que ser mayor que `iat` (fecha de emisión del certificado), y dicha emisión la emitirá
+el portal de Euskalmet. La fecha de expiración puede ponerse cualquiera, pero siempre más alta que la fecha de hoy.
+
+Del mismo modo, el email tiene que ser el mismo que indicaste en la solicitud de Euskalmet.
+
 ## Usar la librería
 
 Si por ejemplo, se quiere descargar las observaciones de una estación,
