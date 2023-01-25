@@ -1,7 +1,7 @@
 requests
 tqdm
 pandas
-PyJWT
+PyJWT>=2.5.0
 pytz
 cryptography
 numpy
