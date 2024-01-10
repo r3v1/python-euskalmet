@@ -344,7 +344,7 @@ class Stations(Euskalmet):
                 df = pd.concat(dfs)
             else:
                 # Single process
-                df = pd.concat([self.get_readings_from(dt) for dt in dates[i : i + 6]])
+                df = pd.concat([self.get_readings_from(station_id, dt) for dt in dates[i : i + 6]])
 
             if not df.empty:
                 # Guardar las observaciones
@@ -366,4 +366,4 @@ class Stations(Euskalmet):
 
 if __name__ == "__main__":
     estacion = Stations()
-    estacion.automatic_download("C017", multiprocess=True)
+    estacion.automatic_download("C017", multiprocess=False)
