@@ -7,10 +7,10 @@ from typing import Union
 
 import numpy as np
 import pandas as pd
-from exceptions import EuskalmetException
 from tqdm import tqdm
 
 from euskalmet import Euskalmet
+from euskalmet.exceptions import EuskalmetException
 
 
 class Stations(Euskalmet):
