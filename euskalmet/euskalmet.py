@@ -130,30 +130,3 @@ class Euskalmet:
             )
         else:
             return json.loads(r.text)
-
-    # ------------------------------------------------------------------------------------ #
-    #               Métodos útiles para agilizar la obtención de datos
-    # ------------------------------------------------------------------------------------ #
-
-    def get_sensor_list(self, sensor_id: str) -> dict:
-        """
-        Devuelve la lista de sensores de todas las estaciones.
-
-        Parameters
-        ----------
-        sensor_id: str
-            Id del sensor
-
-        Returns
-        -------
-        dict
-            Datos de la estación.
-
-        References
-        ----------
-        - https://www.opendata.euskadi.eus/api-euskalmet/?api=stations_sensors#/Sensors/get_euskalmet_sensors__sensor_id_
-        """
-        endpoint = f"/euskalmet/sensors/{sensor_id}"
-        data = self._download(endpoint)
-
-        return data

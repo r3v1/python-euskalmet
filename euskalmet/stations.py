@@ -1,6 +1,7 @@
 import datetime
 import json
 import os
+from functools import partial
 from multiprocessing import Pool
 from typing import Union
 
@@ -13,13 +14,35 @@ from euskalmet import Euskalmet
 
 
 class Stations(Euskalmet):
-    def __init__(self, station_id: str):
+    def __init__(self):
         super().__init__()
-        self.station_id = station_id
 
-    def get_current_station_data(self) -> dict:
+    def get_stations(self) -> dict:
+        """
+        Devuelve la lista de estaciones disponibles.
+
+        Returns
+        -------
+        dict
+            Diccionario con las estaciones.
+
+        References
+        ----------
+        - https://www.opendata.euskadi.eus/api-euskalmet/?api=stations_station
+        """
+        endpoint = "/euskalmet/stations"
+        data = self._download(endpoint)
+
+        return data
+
+    def get_current_station_data(self, station_id: str) -> dict:
         """
         Devuelve los datos actuales de la estación dada.
+
+        Parameters
+        ----------
+        station_id: str
+            Id de la estación
 
         Returns
         -------
@@ -30,13 +53,14 @@ class Stations(Euskalmet):
         ----------
         - https://www.opendata.euskadi.eus/api-euskalmet/?api=stations_station#/Station%20at%20a%20date/get_euskalmet_stations__station_id__current
         """
-        endpoint = f"/euskalmet/stations/{self.station_id}/current"
+        endpoint = f"/euskalmet/stations/{station_id}/current"
         data = self._download(endpoint)
 
         return data
 
     def get_station_readings(
         self,
+        station_id: str,
         sensor_id: str,
         measure_type_id: str,
         measure_id: str,
@@ -50,6 +74,8 @@ class Stations(Euskalmet):
 
         Parameters
         ----------
+        station_id: str
+            Id de la estación
         sensor_id: str
             Id del sensor
         measure_type_id: str
@@ -75,7 +101,7 @@ class Stations(Euskalmet):
         - https://www.opendata.euskadi.eus/api-euskalmet/?api=stations_readings#/Readings/get_euskalmet_readings_forStation__station_id___sensor_id__measures__measureTypeId___measureId__at__YYYY___MM___DD___HH_
         """
         url = (
-            f"/euskalmet/readings/forStation/{self.station_id}/{sensor_id}/measures/{measure_type_id}/{measure_id}/"
+            f"/euskalmet/readings/forStation/{station_id}/{sensor_id}/measures/{measure_type_id}/{measure_id}/"
             f"at/{int(year):04}/{int(month):02}/{int(day):02}/{int(hour):02}"
         )
 
@@ -83,26 +109,77 @@ class Stations(Euskalmet):
 
         return data
 
+    def get_sensors(self) -> dict:
+        """
+        Devuelve la lista de sensores de todas las estaciones.
+
+        Parameters
+        ----------
+        sensor_id: str
+            Id del sensor
+
+        Returns
+        -------
+        dict
+            Datos de la estación.
+
+        References
+        ----------
+        - https://www.opendata.euskadi.eus/api-euskalmet/?api=stations_sensors#/Sensors/get_euskalmet_sensors__sensor_id_
+        """
+        endpoint = f"/euskalmet/sensors"
+        data = self._download(endpoint)
+
+        return data
+
+    def get_sensor(self, sensor_id: str) -> dict:
+        """
+        Devuelve la lista de sensores de la estación dada.
+
+        Parameters
+        ----------
+        sensor_id: str
+            Id del sensor
+
+        Returns
+        -------
+        dict
+            Datos de la estación.
+
+        References
+        ----------
+        - https://www.opendata.euskadi.eus/api-euskalmet/?api=stations_sensors#/Sensors/get_euskalmet_sensors__sensor_id_
+        """
+        endpoint = f"/euskalmet/sensors/{sensor_id}"
+        data = self._download(endpoint)
+
+        return data
+
     # ------------------------------------------------------------------------------------ #
     #               Métodos útiles para agilizar la obtención de datos
     # ------------------------------------------------------------------------------------ #
 
-    def get_station_sensors(self) -> dict:
+    def get_station_sensors(self, station_id: str) -> dict:
         """
         Devuelve la lista de sensores de la estación.
 
         Como es un recurso que se utiliza mucho, se cachea en memoria.
+
+        Parameters
+        ----------
+        station_id: str
+            Id de la estación
 
         Returns
         -------
         dict
             Diccionario con los sensores de la estación.
         """
-        station_file_data = self.data_dir / f"{self.station_id}_info.json"
+        station_file_data = self.data_dir / f"{station_id}_info.json"
         if not station_file_data.is_file():
-            info = self.get_current_station_data()
+            info = self.get_current_station_data(station_id)
             sensor_ids = [x["sensorKey"].split("/")[-1] for x in info["sensors"]]
-            sensors_info = {x: self.get_sensor_list(x)["meteors"] for x in sensor_ids}
+            sensors_info = {x: self.get_sensor(x)["meteors"] for x in sensor_ids}
             with open(station_file_data, "w") as fp:
                 json.dump(sensors_info, fp, indent=4)
 
@@ -111,12 +188,14 @@ class Stations(Euskalmet):
 
         return sensors_info
 
-    def get_readings_from(self, start_date: pd.Timestamp) -> pd.DataFrame:
+    def get_readings_from(self, station_id: str, start_date: pd.Timestamp) -> pd.DataFrame:
         """
         Devuelve todas las lecturas de una estación desde una fecha dada.
 
         Parameters
         ----------
+        station_id: str
+            Id de la estación
         start_date: pd.Timestamp
             Fecha de inicio de la búsqueda
 
@@ -141,7 +220,7 @@ class Stations(Euskalmet):
         2022-05-19 19:50:00+02:00            0.0       105.5  ...      6.336     C017
         """
         # Recoger primero todos los sensores que tiene la estación
-        sensors_info = self.get_station_sensors()
+        sensors_info = self.get_station_sensors(station_id)
 
         # Convertir a UTC
         start_date = start_date.tz_convert("utc")
@@ -151,6 +230,7 @@ class Stations(Euskalmet):
         for sensor_id, values in sensors_info.items():
             for measure_type in values:
                 args = dict(
+                    station_id=station_id,
                     sensor_id=sensor_id,
                     measure_type_id=measure_type["measureType"],
                     measure_id=measure_type["measureId"],
@@ -195,14 +275,17 @@ class Stations(Euskalmet):
 
         if len(readings) > 0:
             df = pd.concat(readings, axis=1)
-            df["station"] = self.station_id
+            df["station"] = station_id
         else:
             df = pd.DataFrame()
 
         return df
 
     def automatic_download(
-        self, multiprocess: bool = True, start_date: Union[str, pd.Timestamp] = None
+        self,
+        station_id: str,
+        multiprocess: bool = True,
+        start_date: Union[str, pd.Timestamp] = None,
     ):
         """
         Descarga las últimas observaciones de la estación dada. Si el fichero con observaciones
@@ -218,7 +301,7 @@ class Stations(Euskalmet):
         start_date: str, pd.Timestamp
             Fecha de inicio de la búsqueda
         """
-        obs_output = self.data_dir / f"{self.station_id}_OBS_MERGED.csv"
+        obs_output = self.data_dir / f"{station_id}_OBS_MERGED.csv"
         if start_date is not None:
             start_date = pd.Timestamp(start_date, tz="utc").tz_convert(self.tz)
         elif obs_output.is_file():
@@ -250,13 +333,14 @@ class Stations(Euskalmet):
         t_ = tqdm(range(0, len(dates) - 5, 6))
         for i in t_:
             t_.set_description(
-                f"[{self.station_id}] Obteniendo lecturas para {dates[i]} - {dates[i + 5]}"
+                f"[{station_id}] Obteniendo lecturas para {dates[i]} - {dates[i + 5]}"
             )
 
             if multiprocess:
                 # Multiprocess
+                func = partial(self.get_readings_from, station_id)
                 with Pool(processes=os.cpu_count() - 1 or 1) as pool:
-                    dfs = pool.map(self.get_readings_from, dates[i : i + 6])
+                    dfs = pool.map(func, dates[i : i + 6])
                 df = pd.concat(dfs)
             else:
                 # Single process
@@ -281,5 +365,5 @@ class Stations(Euskalmet):
 
 
 if __name__ == "__main__":
-    estacion = Stations("C017")
-    estacion.automatic_download(multiprocess=True)
+    estacion = Stations()
+    estacion.automatic_download("C017", multiprocess=True)
