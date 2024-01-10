@@ -7,7 +7,7 @@ pypi:
 	python setup.py sdist bdist_wheel
 
 	# 2. Upload to Pypi
-	twine upload dist/*
+	twine upload --config-file .pypirc --repository python-euskalmet dist/*
 
 format:
 	isort -p black euskalmet/*.py
