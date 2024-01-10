@@ -6,10 +6,10 @@ from typing import Union
 
 import numpy as np
 import pandas as pd
+from exceptions import EuskalmetException
 from tqdm import tqdm
 
 from euskalmet import Euskalmet
-from euskalmet.exceptions import EuskalmetException
 
 
 class Stations(Euskalmet):
@@ -46,8 +46,7 @@ class Stations(Euskalmet):
         hour: Union[str, int],
     ) -> dict:
         """
-        Devuelve las lecturas para una medida específica y
-        una fecha específica.
+        Devuelve las lecturas para una medida específica y una fecha específica.
 
         Parameters
         ----------
@@ -206,9 +205,9 @@ class Stations(Euskalmet):
         self, multiprocess: bool = True, start_date: Union[str, pd.Timestamp] = None
     ):
         """
-        Descarga las últimas observaciones de la estación dada. Si el fichero
-        con observaciones existe, parte de la última hora registrada hasta ahora
-        para descargar nuevos datos. Si no existe, parte desde el 01-11-2021.
+        Descarga las últimas observaciones de la estación dada. Si el fichero con observaciones
+        existe, parte de la última hora registrada hasta ahora para descargar nuevos datos. Si no
+        existe, parte desde el 01-11-2021.
 
         Finalmente, las guarda en un fichero CSV en ~/.eskalmet/data/.
 
@@ -224,9 +223,9 @@ class Stations(Euskalmet):
             start_date = pd.Timestamp(start_date, tz="utc").tz_convert(self.tz)
         elif obs_output.is_file():
             # Empezar desde la última hora guardada en el fichero
-            obs = pd.read_csv(
-                obs_output, index_col=["DATE"], parse_dates=["DATE"]
-            ).tz_convert(self.tz)
+            obs = pd.read_csv(obs_output, index_col=["DATE"], parse_dates=["DATE"]).tz_convert(
+                self.tz
+            )
             start_date = obs.index.max()
         else:
             # Empezar desde los últimos 30 días
@@ -245,9 +244,7 @@ class Stations(Euskalmet):
         # Rellenar con horas anteriores para que sea múltiplo de 6
         i = 1
         while len(dates) % 6 != 0:
-            dates = pd.date_range(
-                start_date - pd.Timedelta(hours=i), end_date, freq="H"
-            )
+            dates = pd.date_range(start_date - pd.Timedelta(hours=i), end_date, freq="H")
             i += 1
 
         t_ = tqdm(range(0, len(dates) - 5, 6))

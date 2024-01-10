@@ -5,8 +5,7 @@ from pathlib import Path
 import jwt
 import pytz
 import requests
-
-from .exceptions import EuskalmetException
+from exceptions import EuskalmetException
 
 # TODO: Introducir loggers
 
@@ -63,15 +62,12 @@ class Euskalmet:
         # Private key
         self._private_key_path = self.config_dir / "privateKey.pem"
         assert self._private_key_path.is_file(), (
-            f"No se encuentra el fichero de clave privada "
-            f"en {self._private_key_path}"
+            f"No se encuentra el fichero de clave privada " f"en {self._private_key_path}"
         )
 
         # Read config file
         cfg_file = self.config_dir / "settings.cfg"
-        assert (
-            cfg_file.is_file()
-        ), f"No se encuentra el fichero de configuración en {cfg_file}"
+        assert cfg_file.is_file(), f"No se encuentra el fichero de configuración en {cfg_file}"
 
         self.config = configparser.ConfigParser()
         self.config.read(cfg_file)
@@ -99,9 +95,7 @@ class Euskalmet:
             "iat": int(self.config["PAYLOAD"]["iat"]),
             "email": self.config["PAYLOAD"]["email"],
         }
-        myToken = jwt.encode(
-            payload, open(self._private_key_path, "rb").read(), algorithm="RS256"
-        )
+        myToken = jwt.encode(payload, open(self._private_key_path, "rb").read(), algorithm="RS256")
         return {"Authorization": f"Bearer {myToken}", "Accept": "application/json"}
 
     def _download(self, endpoint: str) -> dict:
@@ -143,7 +137,7 @@ class Euskalmet:
 
     def get_sensor_list(self, sensor_id: str) -> dict:
         """
-        Devuelve la lista de sensores de todas las estaciones
+        Devuelve la lista de sensores de todas las estaciones.
 
         Parameters
         ----------
