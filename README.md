@@ -58,8 +58,8 @@ Si por ejemplo, se quiere descargar las observaciones de una estación,
 
 ```
 from euskalmet import Stations
-estacion = Stations("C017") # Inicializa el objeto
-estacion.automatic_download(multiprocess=True) # Descarga la información de la estación
+estacion = Stations() # Inicializa el objeto
+estacion.automatic_download("C017", multiprocess=True) # Descarga la información de la estación
 ```
 
 Para más información, revisa la documentación.
